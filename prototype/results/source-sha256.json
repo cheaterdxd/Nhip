@@ -1,0 +1,15 @@
+{
+  "src/App.svelte": "92af49f284a8d45da9da05795d12ca890f643f83ac288848e862d7ad969b0a05",
+  "src/Focus.svelte": "73be642629a0bfc4461288fdfe32fca72de63db26c2323229650f5d63c1fc5b4",
+  "src/style.css": "3c6050c7b2188f4f9eacce6818bd4941d2c552e91db6ebe34dc625c7f936b98f",
+  "src/api.ts": "8da6385ae841cc71afe9a3bf12fb35a3ab2b2651b08992074ab443540a586e3b",
+  "backend/src/main.rs": "3568b2b020763cda71b3c0a33eb8c818edb164c4ef879a9388ece44430516255",
+  "backend/Cargo.lock": "1462b0730a9c2bc19a66d07cc4407c10a4432061b284235a012b80ad257625ad",
+  "src-tauri/src/main.rs": "59bfce5f9c557e4173998930b3e79b83f0d7bd4371b1e3befc92be83166b1dc6",
+  "src-tauri/Cargo.toml": "34c2e091d395fd7e29ef95aafc4d4d6318a717c405fdc7010968c602276f07dd",
+  "src-tauri/Cargo.lock": "63edeea467fb33f71140e2ad2ea5028a910d00e105cb71ca48f054497beddd46",
+  "src-tauri/tauri.conf.json": "7dcd691c5b4ebc48f8be2b19b5194a73ef838c5c3950ded1bfc7f9a8781a2176",
+  "scripts/benchmark.py": "2ee643df79384860b5fd49e4332c8df32b0dbdb8c5830c0b72c1c4636aaec9bb",
+  "scripts/run.py": "d957168fe301fb309c1146679eb7a9971135e2ff3c7f008acb54c66f3d1d4d29",
+  "package-lock.json": "281e0b145e4f902669461127a9bf02e8f0c481e15e8241bcdb2f6062bae7631c"
+}

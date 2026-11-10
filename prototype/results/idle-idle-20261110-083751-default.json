@@ -1,0 +1,1051 @@
+{
+  "variant": "default",
+  "overrides": {},
+  "work_dir": "/home/letuan/code/taskoperate/prototype/.bench-work/idle-20261110-083751-default",
+  "ready": {
+    "build": "release",
+    "client": {
+      "bootstrap_ms": 406.00000000000006,
+      "fixture": {
+        "fixture_date": "2026-11-09",
+        "occurrences": 10001,
+        "ok": true,
+        "projects": 100,
+        "prototype": true
+      },
+      "navigation_to_ready_ms": 711,
+      "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/60.5 Safari/605.1.15"
+    },
+    "mode": "startup",
+    "process_start_to_result_ms": 1667.132934,
+    "external_spawn_to_output_ms": 1717.4540830019396
+  },
+  "idle": {
+    "interval_seconds": 45.05593040099484,
+    "cpu_percent_of_one_core": 3.0406652083468027,
+    "pss_mib_median": 113.490234375,
+    "pss_mib_max": 115.990234375,
+    "full_tree_pss_available": true,
+    "before": {
+      "pids": [
+        98880,
+        98893,
+        98903
+      ],
+      "pss_kib": 118554,
+      "rss_sum_kib": 437864,
+      "unreadable_pids": [],
+      "processes": [
+        {
+          "pid": 98880,
+          "command": "nhip-desktop"
+        },
+        {
+          "pid": 98893,
+          "command": "WebKitNetworkPr"
+        },
+        {
+          "pid": 98903,
+          "command": "WebKitWebProces"
+        }
+      ],
+      "ticks": {
+        "98880": 39,
+        "98893": 10,
+        "98903": 98
+      }
+    },
+    "after": {
+      "pids": [
+        98880,
+        98893,
+        98903
+      ],
+      "pss_kib": 116214,
+      "rss_sum_kib": 435884,
+      "unreadable_pids": [],
+      "processes": [
+        {
+          "pid": 98880,
+          "command": "nhip-desktop"
+        },
+        {
+          "pid": 98893,
+          "command": "WebKitNetworkPr"
+        },
+        {
+          "pid": 98903,
+          "command": "WebKitWebProces"
+        }
+      ],
+      "ticks": {
+        "98880": 153,
+        "98893": 10,
+        "98903": 121
+      }
+    },
+    "memory_samples": [
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118598,
+        "rss_sum_kib": 437968,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118774,
+        "rss_sum_kib": 438144,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118718,
+        "rss_sum_kib": 438088,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118740,
+        "rss_sum_kib": 438168,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118740,
+        "rss_sum_kib": 438168,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118740,
+        "rss_sum_kib": 438168,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118740,
+        "rss_sum_kib": 438168,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118740,
+        "rss_sum_kib": 438168,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 118580,
+        "rss_sum_kib": 438040,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116436,
+        "rss_sum_kib": 436016,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116316,
+        "rss_sum_kib": 435896,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116276,
+        "rss_sum_kib": 435888,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116216,
+        "rss_sum_kib": 435828,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116208,
+        "rss_sum_kib": 435820,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116208,
+        "rss_sum_kib": 435820,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116208,
+        "rss_sum_kib": 435820,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116208,
+        "rss_sum_kib": 435820,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116208,
+        "rss_sum_kib": 435820,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      },
+      {
+        "pids": [
+          98880,
+          98893,
+          98903
+        ],
+        "pss_kib": 116214,
+        "rss_sum_kib": 435884,
+        "unreadable_pids": []
+      }
+    ]
+  },
+  "thread_cpu": [
+    {
+      "tid": "98880",
+      "pid": 98880,
+      "name": "nhip-desktop",
+      "cpu_percent_one_core": 2.436280977964929
+    },
+    {
+      "tid": "98903",
+      "pid": 98903,
+      "name": "WebKitWebProces",
+      "cpu_percent_one_core": 0.28792411557767345
+    },
+    {
+      "tid": "98919",
+      "pid": 98903,
+      "name": "ReceiveQueue",
+      "cpu_percent_one_core": 0.06644402667177078
+    },
+    {
+      "tid": "98905",
+      "pid": 98880,
+      "name": "ReceiveQueue",
+      "cpu_percent_one_core": 0.04429601778118053
+    },
+    {
+      "tid": "98882",
+      "pid": 98880,
+      "name": "[pango] fontcon",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98883",
+      "pid": 98880,
+      "name": "pool-spawner",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98884",
+      "pid": 98880,
+      "name": "gmain",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98886",
+      "pid": 98880,
+      "name": "dconf worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98887",
+      "pid": 98880,
+      "name": "gdbus",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98888",
+      "pid": 98880,
+      "name": "nhip-desktop",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98891",
+      "pid": 98880,
+      "name": "ebsiteDataStore",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98902",
+      "pid": 98880,
+      "name": "PressureMonitor",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98904",
+      "pid": 98880,
+      "name": "ReceiveQueue",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98951",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98952",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98953",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98954",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98955",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98956",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98957",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98958",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98959",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98960",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98961",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98962",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98963",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98964",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98965",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98966",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98967",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98968",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98969",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98970",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98971",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98972",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98973",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98974",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98975",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98976",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98977",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98978",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98979",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98980",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98981",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98982",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98983",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98984",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98985",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98986",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98987",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98988",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98989",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98990",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98991",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98992",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98993",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98994",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98995",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98996",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98997",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98998",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98999",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99000",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99001",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99002",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99003",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99004",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99005",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99006",
+      "pid": 98880,
+      "name": "tokio-rt-worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98893",
+      "pid": 98893,
+      "name": "WebKitNetworkPr",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98896",
+      "pid": 98893,
+      "name": "pool-spawner",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98897",
+      "pid": 98893,
+      "name": "gmain",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98898",
+      "pid": 98893,
+      "name": "gdbus",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98899",
+      "pid": 98893,
+      "name": "ReceiveQueue",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98906",
+      "pid": 98893,
+      "name": "persistent",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98907",
+      "pid": 98893,
+      "name": "Storage",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98908",
+      "pid": 98893,
+      "name": "background",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98909",
+      "pid": 98893,
+      "name": "erialBackground",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98939",
+      "pid": 98893,
+      "name": "ReceiveQueue",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99010",
+      "pid": 98893,
+      "name": "dconf worker",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98916",
+      "pid": 98903,
+      "name": "EventDispatcher",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98917",
+      "pid": 98903,
+      "name": "rruptDispatcher",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98918",
+      "pid": 98903,
+      "name": "uggerDispatcher",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98940",
+      "pid": 98903,
+      "name": "ReceiveQueue",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98941",
+      "pid": 98903,
+      "name": "pool-spawner",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98942",
+      "pid": 98903,
+      "name": "gmain",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "98944",
+      "pid": 98903,
+      "name": "gdbus",
+      "cpu_percent_one_core": 0.0
+    },
+    {
+      "tid": "99012",
+      "pid": 98903,
+      "name": "CryptoQueue",
+      "cpu_percent_one_core": 0.0
+    }
+  ],
+  "completed": true
+}

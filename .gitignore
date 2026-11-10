@@ -1,0 +1,17 @@
+prototype/node_modules/
+prototype/dist/
+prototype/target/
+prototype/src-tauri/target/
+prototype/backend/target/
+prototype/.data/
+prototype/.bench-work/
+*.log
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.pem
+.agents/
+.aws/
+.codex/

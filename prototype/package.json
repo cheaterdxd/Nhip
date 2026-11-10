@@ -1,0 +1,25 @@
+{
+  "name": "nhip-performance-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 1420 --strictPort",
+    "build": "vite build",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "tauri": "tauri",
+    "desktop:build": "tauri build --no-bundle"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "lucide-svelte": "^0.468",
+    "svelte": "^5"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6",
+    "@tauri-apps/cli": "^2",
+    "svelte-check": "^4",
+    "typescript": "^5",
+    "vite": "^7"
+  }
+}

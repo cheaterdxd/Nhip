@@ -1,0 +1,20 @@
+[package]
+name = "nhip-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "time", "sync"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.37", features = ["bundled"] }
+chrono = { version = "0.4", features = ["serde"] }
+tower-http = { version = "0.6", features = ["cors", "fs", "set-header"] }
+
+web-push = { version = "0.11", default-features = false, features = ["hyper-client"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
