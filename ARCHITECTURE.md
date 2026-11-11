@@ -2,7 +2,7 @@
 
 Phiên bản đặc tả: 2.2 · Ngày rà soát: 10/11/2026.
 
-Trạng thái: giai đoạn thiết kế, chưa xây ứng dụng thật. Demo chỉ để góp ý giao diện, không phải danh sách đầy đủ tính năng hay nguồn dữ liệu vận hành.
+Trạng thái: đặc tả sản phẩm vẫn là mục tiêu nghiệm thu; prototype Svelte + Tauri + Rust đang được hoàn thiện để vận hành cục bộ trước. AI hiện là placeholder trong giao diện theo thứ tự ưu tiên mới; thử nghiệm Codex ở backend chưa được gọi từ client, Antigravity chưa tích hợp. Có sao lưu mã hóa ra file local và khôi phục; tự động tải Drive/retention được hoãn. Backend cá nhân đang chạy bằng systemd user service với database `.data/nhip.sqlite`, mã truy cập riêng và khóa VAPID đã nạp; database thử nghiệm cũ được giữ nguyên. Tailscale Serve đã được cấu hình và kiểm chứng HTTPS. Ngày 11/11/2026, một Web Push gửi từ backend tới iPhone thật được server ghi nhận thành công; người dùng xác nhận thông báo xuất hiện khi app đóng và chạm mở đúng task. Chưa thử Focus, mất/kết nối lại VPN và thông báo trên Windows 11. Tài khoản theo mô hình sản phẩm và một số quy tắc lịch vẫn chưa triển khai; lịch Bận và gợi ý giờ trống mới ở mức cơ bản. Xem trạng thái trong [README prototype](/home/letuan/code/taskoperate/prototype/README.md).
 
 ## 1. Mục tiêu, người dùng và trạng thái quyết định
 
@@ -267,7 +267,7 @@ Phản hồi chờ đồng bộ phải có nhãn rõ; các máy khác chỉ dừ
 ### 11.1. Mã khóa và thiết bị
 
 - Một mã khóa để đăng ký/mở phiên ứng dụng; backend lưu giá trị băm phù hợp, giới hạn thử sai. Thiết bị đã đăng ký dùng phiên xác thực riêng có thể thu hồi, không gửi lại mã khóa cho mọi request.
-- Tailscale giới hạn đường vào; backend chỉ công bố qua địa chỉ riêng với HTTPS. Tailscale Serve là phương án reverse proxy đề xuất; không mở cổng công khai/Funnel cho nhu cầu hiện tại.
+- Tailscale giới hạn đường vào. Client desktop có thể gọi thẳng `http://<IP-tailnet>:<cổng>` nếu backend bind lên địa chỉ tailnet; Serve không bắt buộc cho luồng này. PWA trên iPhone cần secure context (HTTPS) để dùng Service Worker/Web Push, nên cần Tailscale Serve hoặc TLS proxy tương đương. Prototype hiện vẫn bind loopback, chưa nhận kết nối từ thiết bị khác; không mở cổng công khai/Funnel cho nhu cầu hiện tại.
 - PWA và desktop lưu thông tin phiên bằng cơ chế phù hợp nền tảng; khóa màn hình cục bộ, xác thực API và khóa giải mã backup là ba trách nhiệm riêng.
 - Danh sách thiết bị có thời điểm hoạt động, quyền nhận nhắc và thu hồi. Dữ liệu bị thu hồi không thể tiếp tục đồng bộ; cache cũ cần được xử lý trong luồng đăng xuất.
 
@@ -366,8 +366,8 @@ Kiểm thử gồm quy tắc nghiệp vụ, tích hợp database/worker và ki�
 
 ### 15.1. Cần làm rõ trước khi xây đầy đủ
 
-1. **Stack qua kiểm chứng:** người dùng ưu tiên tốc độ chạy và yêu cầu mở rộng lựa chọn. Dùng ứng viên Svelte/Tauri + Rust/Axum + SQLite ở mục 10.2 để đo đầu tiên, có đối chứng thay vì yêu cầu người dùng tự chọn theo danh tiếng công nghệ. Chỉ cố định sau bài đo mục 17; systemd là cách chạy server đề xuất ban đầu.
-2. **Thiết bị đích cụ thể:** phiên bản Windows, bản phân phối/phiên bản Linux cho server và client, phiên bản iOS. Dùng thông tin này để quyết định nền build, định dạng bộ cài và giới hạn phải hỗ trợ; không tự suy ra PC đang chạy công cụ chính là server sẽ triển khai.
+1. **Stack:** đã chọn Svelte + Tauri cho client, Rust/Axum cho backend và SQLite cho prototype; tiếp tục dùng stack này trong khi hoàn thiện app. Bài đo hiện có xác nhận ứng viên chạy được trên Linux trong cấu hình đã đo, không chứng minh nhanh nhất so với mọi lựa chọn hoặc hiệu năng trên Windows/iPhone. Nếu xuất hiện nút thắt có bằng chứng trên thiết bị đích thì mới so sánh lớp liên quan.
+2. **Thiết bị đích:** Windows 11 và iPhone 17e đã được xác nhận. Cần ghi nhận build Windows, phiên bản iOS và distro/phiên bản Linux trên máy chủ lúc thử trực tiếp để chốt phạm vi hỗ trợ; không coi thử trên máy phát triển thay thế nghiệm thu PC ở nhà.
 Thứ tự triển khai mặc định theo mục 2: kiểm chứng một luồng thật trên cả Windows/Linux/iPhone, rồi hoàn thiện đầy đủ. Đây là thứ tự làm việc, không phải quyết định cắt tính năng và không cần hỏi lại nếu người dùng không yêu cầu đổi.
 
 ### 15.2. Cần kiểm chứng bằng thử nghiệm kỹ thuật nhỏ trước khi hứa khả năng
@@ -437,5 +437,5 @@ Nguồn xác nhận khả năng công nghệ, không thay thế kiểm chứng t
 
 - Với 100 dự án/10.000 lần thực hiện ban đầu: p95 đọc hôm nay 1,40 ms, ghi task 2,51 ms, tìm lịch 1,24 ms trở xuống; bốn client hỗn hợp 6,86 ms. Đây là round trip HTTP loopback, chưa gồm Tailscale.
 - Tauri release mở 20 lần thành công, p95 1,684 giây khi cache ấm; chưa xác minh mục tiêu mở nguội. Proxy render đổi màn hình p95 48 ms, chọn task 33 ms, chưa phải INP thao tác thật.
-- PSS toàn cây desktop trung vị 110,33 MiB; backend 6,94 MiB. CPU desktop nghỉ 10,45% một nhân trong 60 giây: chưa đạt yêu cầu gần không, cần profile trước khi cố định stack.
+- PSS toàn cây desktop trung vị 110,33 MiB; backend 6,94 MiB. CPU desktop nghỉ 10,45% một nhân trong 60 giây: chưa đạt mục tiêu gần không. Theo chỉ đạo hiện tại, không tiếp tục điều tra sâu CPU; giữ kết quả này như giới hạn đã biết và ưu tiên hoàn thiện tính năng.
 - Giữ Svelte/Tauri + Rust làm ứng viên đang kiểm chứng. Các phần nhắc nền, task lặp đầy đủ, xác thực, AI, Drive và đồng bộ vẫn phải triển khai và kiểm tra; kết quả prototype không thay thế tiêu chí nghiệm thu sản phẩm.

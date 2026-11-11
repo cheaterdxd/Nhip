@@ -1,5 +1,9 @@
 # Kết quả prototype Svelte + Tauri + Rust trên Linux
 
+## Kiểm chứng iPhone sau lượt đo Linux
+
+Ngày 11/11/2026, backend cá nhân chạy bằng systemd qua Tailscale Serve HTTPS. Một task thử riêng được đặt nhắc sau 60 giây; `app_push_delivery` ghi `sent` ở lần gửi đầu. Người dùng xác nhận iPhone nhận thông báo khi PWA đã đóng và chạm thông báo mở đúng task. Task thử đã được đánh dấu hoàn thành để dừng nhắc lặp. Kết quả này chứng minh một luồng Web Push thực tế; chưa kiểm chứng Focus, mất rồi kết nối lại Tailscale, nhiều lần nhắc liên tiếp hoặc Windows.
+
 Lượt đo hoàn tất ngày 10/11/2026 theo giờ máy. Dữ liệu gốc: [results/linux-release.json](results/linux-release.json). Cách build, mở app và chạy lại: [README.md](README.md).
 
 **Kết luận:** tốc độ API, tìm lịch và phản hồi giao diện đạt mục tiêu trong lát cắt đã đo. Khởi động khi cache đã ấm dưới 2 giây. Chưa thông qua toàn bộ cổng hiệu năng: CPU desktop lúc nghỉ còn cao, startup nguội và các nền tảng khác chưa đo. Có cơ sở tiếp tục với ứng viên này, chưa có cơ sở khẳng định đây là stack nhanh nhất.

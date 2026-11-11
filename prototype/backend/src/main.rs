@@ -1,4 +1,12 @@
 mod reminders;
+mod product;
+mod task_reminders;
+mod recurring;
+mod weekly_report;
+mod app_calendar;
+mod app_schedule;
+mod app_events;
+mod ai;
 use axum::{extract::{Path, Query, State}, http::{HeaderValue, Method, StatusCode}, response::{IntoResponse, Response}, routing::{get, post, patch}, Json, Router};
 use chrono::{Datelike, Duration, NaiveDate};
 use rusqlite::{params, Connection, OptionalExtension};
@@ -6,6 +14,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{path::PathBuf, sync::{Arc, Mutex}, time::Instant};
 use tower_http::{cors::CorsLayer, services::{ServeDir, ServeFile}};
+#[cfg(unix)] use std::os::unix::fs::PermissionsExt;
 
 type Db = Arc<Mutex<Connection>>;
 type ApiResult<T> = Result<Json<T>, ApiError>;
@@ -39,9 +48,10 @@ const TASK_SELECT:&str="SELECT t.id,t.project_id,p.name,p.area,t.title,t.notes,t
 fn load_task(conn:&Connection,id:i64)->Result<Task,ApiError>{
     conn.query_row(&format!("{TASK_SELECT} WHERE t.id=?1"),[id],row_task).optional()?.ok_or_else(||ApiError(StatusCode::NOT_FOUND,"Task not found".into()))
 }
-fn setup(path:&PathBuf)->Result<Connection,Box<dyn std::error::Error>>{
+fn setup(path:&PathBuf,seed_fixture:bool)->Result<Connection,Box<dyn std::error::Error>>{
     if let Some(parent)=path.parent(){ std::fs::create_dir_all(parent)?; }
     let mut conn=Connection::open(path)?;
+    #[cfg(unix)] std::fs::set_permissions(path,std::fs::Permissions::from_mode(0o600))?;
     conn.execute_batch("PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON;
       CREATE TABLE IF NOT EXISTS projects(id INTEGER PRIMARY KEY,name TEXT NOT NULL,area TEXT NOT NULL CHECK(area IN ('company','personal')));
       CREATE TABLE IF NOT EXISTS tasks(id INTEGER PRIMARY KEY AUTOINCREMENT,project_id INTEGER NOT NULL REFERENCES projects(id),title TEXT NOT NULL,notes TEXT NOT NULL DEFAULT '',duration INTEGER NOT NULL,remaining INTEGER NOT NULL,day TEXT,minute INTEGER,status TEXT NOT NULL,energy TEXT NOT NULL DEFAULT 'medium',version INTEGER NOT NULL DEFAULT 0);
@@ -50,8 +60,16 @@ fn setup(path:&PathBuf)->Result<Connection,Box<dyn std::error::Error>>{
       CREATE INDEX IF NOT EXISTS task_project ON tasks(project_id,status);
       CREATE TABLE IF NOT EXISTS sessions(id INTEGER PRIMARY KEY AUTOINCREMENT,task_id INTEGER NOT NULL REFERENCES tasks(id),seconds INTEGER NOT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);")?;
     reminders::schema(&conn)?;
+    product::schema(&conn)?;
+    task_reminders::schema(&conn)?;
+    recurring::schema(&conn)?;
+    weekly_report::schema(&conn)?;
+    app_events::schema(&conn)?;
+    app_schedule::schema(&conn)?;
+    ai::schema(&conn)?;
     let count:i64=conn.query_row("SELECT count(*) FROM projects",[],|r|r.get(0))?;
-    if count==0{
+    // Real app startup stays empty. Synthetic benchmark data is opt-in only.
+    if count==0 && seed_fixture{
         let tx=conn.transaction()?;
         for id in 1..=100{
             let name=match id{1=>"App quản lý công việc".into(),2=>"Website khách hàng".into(),3=>"Học & phát triển".into(),_=>format!("Dự án {id:03}")};
@@ -174,13 +192,44 @@ async fn report(State(state):State<AppState>)->ApiResult<Value>{db_job(state,|co
 #[tokio::main(flavor="multi_thread",worker_threads=2)]
 async fn main()->Result<(),Box<dyn std::error::Error>>{
     let path=PathBuf::from(std::env::var("NHIP_DB").unwrap_or_else(|_|".data/prototype.sqlite".into()));
-    let db=setup(&path)?;
+    let db=setup(&path,std::env::var("NHIP_SEED_FIXTURE").as_deref()==Ok("1"))?;
     let state=AppState{db:Arc::new(Mutex::new(db)),revision:tokio::sync::watch::channel(0).0};
     tokio::spawn(reminders::worker(state.clone()));
+    tokio::spawn(task_reminders::worker(state.clone()));
+    tokio::spawn(recurring::worker(state.clone()));
     let origins=["http://127.0.0.1:1420","http://localhost:1420","http://tauri.localhost","tauri://localhost"].map(|s|s.parse::<HeaderValue>().unwrap());
-    let cors=CorsLayer::new().allow_origin(origins).allow_methods([Method::GET,Method::POST,Method::PATCH]).allow_headers([axum::http::header::CONTENT_TYPE,axum::http::header::AUTHORIZATION]);
+    let cors=CorsLayer::new().allow_origin(origins).allow_methods([Method::GET,Method::POST,Method::PATCH,Method::DELETE]).allow_headers([axum::http::header::CONTENT_TYPE,axum::http::header::AUTHORIZATION]);
     let dist=PathBuf::from(std::env::var("NHIP_DIST").unwrap_or_else(|_|"dist".into()));
     let app=Router::new()
+      .route("/api/app/reminders",get(task_reminders::list).post(task_reminders::schedule))
+      .route("/api/app/reminders/{id}/reschedule",post(task_reminders::reschedule))
+      .route("/api/app/reminders/{id}/start-focus",post(task_reminders::start_focus))
+      .route("/api/app/reminders/{id}/restructure",post(task_reminders::restructure))
+      .route("/api/app/focus-sessions",get(task_reminders::active_focus))
+      .route("/api/app/tasks/{id}/focus-sessions",post(task_reminders::start_task_focus))
+      .route("/api/app/focus-sessions/{id}/finish",post(task_reminders::finish_focus))
+      .route("/api/app/recurring-rules",get(recurring::list).post(recurring::create))
+      .route("/api/app/recurring-rules/{id}",patch(recurring::set_status))
+      .route("/api/app/reports/weekly",get(weekly_report::get))
+      .route("/api/app/reports/weekly/{week_start}/ack",post(weekly_report::acknowledge))
+      .route("/api/app/calendar",get(app_calendar::get))
+      .route("/api/app/events",get(app_events::list).post(app_events::create))
+      .route("/api/app/events/{id}",patch(app_events::update).delete(app_events::delete))
+      .route("/api/app/slots",get(app_schedule::slots))
+      .route("/api/app/plans",get(app_schedule::list).post(app_schedule::apply))
+      .route("/api/app/plans/{id}/cancel",post(app_schedule::cancel))
+      .route("/api/app/plans/{plan_id}/sessions/{session_id}/complete",post(app_schedule::complete_session))
+      .route("/api/app/projects",get(product::projects).post(product::create_project))
+      .route("/api/app/projects/{id}",patch(product::update_project))
+      .route("/api/app/items",get(product::items).post(product::capture))
+      .route("/api/app/items/{id}/clarify",post(product::clarify))
+      .route("/api/app/items/{id}/transition",post(product::transition))
+      .route("/api/app/items/{id}/history",get(product::history))
+      .route("/api/app/items/{id}/content",post(product::edit_content))
+      .route("/api/app/ai/drafts",get(ai::list).post(ai::create))
+      .route("/api/app/ai/drafts/{id}/resolve",post(ai::resolve))
+      .route("/api/app/ai/weekly-reports",get(ai::list_weekly).post(ai::create_weekly))
+      .route("/api/app/ai/weekly-reports/{id}/resolve",post(ai::resolve_weekly))
       .route("/api/devices",post(reminders::register))
       .route("/api/devices/{device}/updates",get(reminders::updates))
       .route("/api/reminders",post(reminders::create))
@@ -192,9 +241,13 @@ async fn main()->Result<(),Box<dyn std::error::Error>>{
       .route("/api/calendar",get(calendar)).route("/api/slots",get(slots)).route("/api/sessions",post(session)).route("/api/report",get(report))
       .fallback_service(ServeDir::new(&dist).not_found_service(ServeFile::new(dist.join("index.html"))))
       .layer(axum::middleware::from_fn(access)).layer(cors).with_state(state);
+    let host=std::env::var("NHIP_HOST").unwrap_or_else(|_|"127.0.0.1".into());
     let port=std::env::var("NHIP_PORT").unwrap_or_else(|_|"4876".into());
-    let listener=tokio::net::TcpListener::bind(format!("127.0.0.1:{port}")).await?;
-    println!("Nhịp prototype backend http://127.0.0.1:{port} · {}",path.display());
+    if host!="127.0.0.1" && host!="localhost" && std::env::var("NHIP_ACCESS_KEY").unwrap_or_default().is_empty(){
+        return Err("NHIP_ACCESS_KEY is required when NHIP_HOST is not loopback".into());
+    }
+    let listener=tokio::net::TcpListener::bind(format!("{host}:{port}")).await?;
+    println!("Nhịp prototype backend http://{host}:{port} · {}",path.display());
     axum::serve(listener,app).with_graceful_shutdown(async{let _=tokio::signal::ctrl_c().await;}).await?;
     Ok(())
 }
@@ -202,7 +255,7 @@ async fn main()->Result<(),Box<dyn std::error::Error>>{
 #[cfg(test)]
 mod tests{
     use super::*;
-    fn db()->Connection{let path=std::env::temp_dir().join(format!("nhip-test-{}-{}.sqlite",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));setup(&path).unwrap()}
+    fn db()->Connection{let path=std::env::temp_dir().join(format!("nhip-test-{}-{}.sqlite",std::process::id(),std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));setup(&path,true).unwrap()}
     #[test] fn fixture_and_planner_respect_constraints(){
         let conn=db();assert_eq!(conn.query_row("SELECT count(*) FROM tasks",[],|r|r.get::<_,i64>(0)).unwrap(),10000);
         let slots=calculate_slots(&conn,9501,"2026-11-09").unwrap();

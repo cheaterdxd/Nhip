@@ -49,8 +49,10 @@ fn finish_benchmark(
 }
 
 #[tauri::command]
-fn notify_reminder(app: tauri::AppHandle, id:i32, task_id:i64, title:String)->Result<(),String>{
- app.notification().builder().id(id).title("Nhịp · Cần phản hồi").body(title).extra("task_id",task_id).extra("reminder_id",id).show().map_err(|e|e.to_string())
+fn notify_reminder(app: tauri::AppHandle, id:i32, task_id:i64, title:String, source:String, week_start:Option<String>)->Result<(),String>{
+ let builder=app.notification().builder().id(id).title("Nhịp · Cần phản hồi").body(title).extra("task_id",task_id).extra("reminder_id",id).extra("source",source);
+ let builder=if let Some(week)=week_start{builder.extra("week_start",week)}else{builder};
+ builder.show().map_err(|e|e.to_string())
 }
 #[tauri::command]
 fn dismiss_reminder(app:tauri::AppHandle,id:i32)->Result<(),String>{app.notification().remove_active(vec![id]).map_err(|e|e.to_string())}
@@ -69,7 +71,7 @@ fn main() {
                     if let Some(w)=handle.get_webview_window("main") {let _=w.unminimize();let _=w.show();let _=w.set_focus();}
                     let _=handle.emit("reminder-open",n.extra());
                 }
-            });
+            })?;
             if std::env::var_os("NHIP_BENCH_OUTPUT").is_none() {
                 use tauri::{menu::{Menu,MenuItem},tray::TrayIconBuilder};
                 let show=MenuItem::with_id(app,"show","Mở Nhịp",true,None::<&str>)?;

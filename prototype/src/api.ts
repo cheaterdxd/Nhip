@@ -6,12 +6,12 @@ export type Task = {
 };
 export type Slot = { date: string; minute: number; duration: number };
 export const API = localStorage.getItem('nhip-server') || import.meta.env.VITE_API_BASE || (location.protocol === 'https:' ? location.origin : 'http://127.0.0.1:4876');
-export async function request<T>(path: string, body?: unknown, method?: string): Promise<T> {
+export async function request<T>(path: string, body?: unknown, method?: string, timeoutMs=10000): Promise<T> {
   const response = await fetch(API + path, {
     method: method || (body ? 'POST' : 'GET'),
     headers: { ...(body ? { 'content-type': 'application/json' } : {}), ...(localStorage.getItem('nhip-key') ? {authorization: `Bearer ${localStorage.getItem('nhip-key')}`} : {}) },
     body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) throw new Error((await response.json()).error || `HTTP ${response.status}`);
   return response.json();

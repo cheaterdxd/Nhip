@@ -29,14 +29,16 @@ def stats(values):
 
 
 class Client:
-    def __init__(self, port):
-        self.conn = http.client.HTTPConnection("127.0.0.1", port, timeout=15)
+    def __init__(self, port, access_key=None, host="127.0.0.1"):
+        self.conn = http.client.HTTPConnection(host, port, timeout=15)
+        self.access_key = access_key
 
     def call(self, method, path, body=None, expected=200):
         data = json.dumps(body, ensure_ascii=False).encode() if body is not None else None
         start = time.perf_counter_ns()
-        self.conn.request(method, path, body=data,
-                          headers={"content-type": "application/json"} if data else {})
+        headers={"content-type": "application/json"} if data else {}
+        if self.access_key:headers["authorization"]="Bearer "+self.access_key
+        self.conn.request(method, path, body=data, headers=headers)
         response = self.conn.getresponse()
         raw = response.read()
         elapsed = (time.perf_counter_ns() - start) / 1e6
@@ -48,12 +50,12 @@ class Client:
         self.conn.close()
 
 
-def wait_ready(port, proc, timeout=30):
+def wait_ready(port, proc, timeout=30, access_key=None, host="127.0.0.1"):
     start = time.monotonic()
     while time.monotonic() - start < timeout:
         if proc.poll() is not None:
             raise RuntimeError(f"Backend exited with {proc.returncode}")
-        c = Client(port)
+        c = Client(port, access_key, host)
         try:
             _, result = c.call("GET", "/api/health")
             return result
@@ -215,7 +217,7 @@ def main():
             raise RuntimeError('Port 4876 is in use. Stop the manual prototype backend first; refusing to benchmark someone else\'s database.')
     work=ROOT/'.bench-work'/time.strftime('%Y%m%d-%H%M%S')
     work.mkdir(parents=True,exist_ok=True)
-    env={**os.environ,'NHIP_DB':str(work/'fixture.sqlite'),'NHIP_DIST':str(ROOT/'dist'),'NHIP_PORT':'4876'}
+    env={**os.environ,'NHIP_DB':str(work/'fixture.sqlite'),'NHIP_DIST':str(ROOT/'dist'),'NHIP_PORT':'4876','NHIP_SEED_FIXTURE':'1'}
     log=open(work/'backend.log','wb')
     backend=subprocess.Popen([str(args.backend.resolve())],env=env,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT)
     desktop=None

@@ -47,8 +47,23 @@ pub async fn updates(State(s):State<AppState>,Path(device):Path<String>,Query(q)
  db_job(s,move|c|{
   let exists:bool=c.query_row("SELECT EXISTS(SELECT 1 FROM devices WHERE id=?1)",[device],|r|r.get(0))?;
   if !exists{return Err(bad("Unknown device"))}
-  let mut stmt=c.prepare("SELECT r.id,r.task_id,t.title,r.ack_device FROM reminders r JOIN tasks t ON t.id=r.task_id WHERE r.due<=?1 ORDER BY r.id DESC LIMIT 200")?;
-  let rows=stmt.query_map([chrono::Utc::now().timestamp()],|r|Ok(json!({"id":r.get::<_,i64>(0)?,"task_id":r.get::<_,i64>(1)?,"title":r.get::<_,String>(2)?,"ack_device":r.get::<_,Option<String>>(3)?})))?.collect::<Result<Vec<_>,_>>()?;
+  // This prototype returns all due reminders so old unresolved items and their
+  // acknowledgments cannot disappear behind a fixed newest-first limit.
+  let mut stmt=c.prepare("SELECT r.id,r.task_id,t.title,r.ack_device FROM reminders r JOIN tasks t ON t.id=r.task_id WHERE r.due<=?1 ORDER BY r.id DESC")?;
+  let mut rows=stmt.query_map([chrono::Utc::now().timestamp()],|r|Ok(json!({"id":r.get::<_,i64>(0)?,"task_id":r.get::<_,i64>(1)?,"title":r.get::<_,String>(2)?,"ack_device":r.get::<_,Option<String>>(3)?,"source":"fixture"})))?.collect::<Result<Vec<_>,_>>()?;
+  let mut app=c.prepare("SELECT a.id,r.id,r.task_id,i.content,r.state,r.due_at,r.version,r.snoozes,a.id=COALESCE((SELECT MAX(a2.id) FROM app_reminder_alerts a2 WHERE a2.reminder_id=r.id),0) AND a.id>r.last_reset_alert,a.kind FROM app_reminder_alerts a JOIN app_task_reminders r ON r.id=a.reminder_id JOIN app_items i ON i.id=r.task_id ORDER BY a.id DESC")?;
+  let app_rows=app.query_map([],|r|{
+   let alert_id:i64=r.get(0)?;let state:String=r.get(4)?;let latest:bool=r.get(8)?;let kind:String=r.get(9)?;
+   Ok(json!({"id":1_000_000_000_i64+alert_id,"source":"app","reminder_id":r.get::<_,i64>(1)?,"task_id":r.get::<_,i64>(2)?,"title":r.get::<_,String>(3)?,"kind":kind,"state":state,"due_at":r.get::<_,i64>(5)?,"version":r.get::<_,i64>(6)?,"snoozes":r.get::<_,i64>(7)?,"ack_device":if (state=="scheduled"||state=="decision")&&latest {None} else {Some("resolved")}}))
+  })?.collect::<Result<Vec<_>,_>>()?;
+  rows.extend(app_rows);
+  let mut weekly=c.prepare("SELECT week_start,ack_device FROM app_weekly_report_alerts ORDER BY created_at DESC")?;
+  let weekly_rows=weekly.query_map([],|r|{
+   let week_start:String=r.get(0)?;
+   let id=crate::weekly_report::notification_id(&week_start).unwrap_or(0);
+   Ok(json!({"id":id,"task_id":0,"title":"Báo cáo tuần đã sẵn sàng","source":"report","kind":"weekly_report","week_start":week_start,"ack_device":r.get::<_,Option<String>>(1)?}))
+  })?.collect::<Result<Vec<_>,_>>()?;
+  rows.extend(weekly_rows);
   Ok(json!({"revision":revision,"reminders":rows}))
  }).await
 }
@@ -58,7 +73,10 @@ pub async fn worker(s:AppState){
  loop {
   tokio::time::sleep(std::time::Duration::from_secs(1)).await;
   let jobs={let c=match s.db.lock(){Ok(c)=>c,Err(_)=>continue};
-   let changed=c.execute("UPDATE reminders SET announced=1 WHERE due<=?1 AND announced=0",[chrono::Utc::now().timestamp()]).unwrap_or(0);
+   let now=chrono::Utc::now().timestamp();
+   let report_created=match crate::weekly_report::dispatch_due(&c,now){Ok(created)=>created,Err(e)=>{eprintln!("Weekly report alert scheduling failed: {}",e.1);false}};
+   if report_created{s.revision.send_modify(|v|*v+=1);}
+   let changed=c.execute("UPDATE reminders SET announced=1 WHERE due<=?1 AND announced=0",[now]).unwrap_or(0);
    if changed>0{s.revision.send_modify(|v|*v+=1);}
    let _=c.execute("INSERT OR IGNORE INTO push_delivery(reminder,device) SELECT r.id,d.id FROM reminders r CROSS JOIN devices d WHERE r.ack_device IS NULL AND r.due<=?1 AND d.channel='webpush'",[chrono::Utc::now().timestamp()]);
    let mut stmt=match c.prepare("SELECT r.id,r.task_id,d.id,d.subscription FROM push_delivery p JOIN reminders r ON r.id=p.reminder JOIN devices d ON d.id=p.device WHERE r.ack_device IS NULL AND p.status='pending' AND p.attempts<5 AND p.next_try<=?1 LIMIT 10"){Ok(x)=>x,Err(_)=>continue};
@@ -76,7 +94,45 @@ pub async fn worker(s:AppState){
     tokio::time::timeout(std::time::Duration::from_secs(10),client.send(builder.build().map_err(|e|e.to_string())?)).await.map_err(|e|e.to_string())?.map_err(|e|e.to_string())
    }.await;
    if let Ok(c)=s.db.lock(){let _=c.execute("UPDATE push_delivery SET attempts=attempts+1,next_try=?3,status=?4 WHERE reminder=?1 AND device=?2",params![id,device,chrono::Utc::now().timestamp()+60,if result.is_ok(){"sent"}else{"pending"}]);}
-   if let Err(e)=result{eprintln!("Push {id} failed: {e}");}
+   if result.is_err(){eprintln!("Push {id} failed; retry is scheduled.");}
+  }
+  let app_jobs={let c=match s.db.lock(){Ok(c)=>c,Err(_)=>continue};
+   let _=c.execute("INSERT OR IGNORE INTO app_push_delivery(alert_id,device) SELECT a.id,d.id FROM app_reminder_alerts a JOIN app_task_reminders r ON r.id=a.reminder_id CROSS JOIN devices d WHERE r.state IN ('scheduled','decision') AND a.id>r.last_reset_alert AND a.id=(SELECT MAX(a2.id) FROM app_reminder_alerts a2 WHERE a2.reminder_id=r.id) AND d.channel='webpush'",[]);
+   let mut stmt=match c.prepare("SELECT a.id,r.task_id,d.id,d.subscription,a.kind FROM app_push_delivery p JOIN app_reminder_alerts a ON a.id=p.alert_id JOIN app_task_reminders r ON r.id=a.reminder_id JOIN devices d ON d.id=p.device WHERE r.state IN ('scheduled','decision') AND a.id>r.last_reset_alert AND a.id=(SELECT MAX(a2.id) FROM app_reminder_alerts a2 WHERE a2.reminder_id=r.id) AND p.status='pending' AND p.attempts<5 AND p.next_try<=?1 LIMIT 10"){Ok(q)=>q,Err(_)=>continue};
+   let rows=stmt.query_map([chrono::Utc::now().timestamp()],|r|Ok((r.get::<_,i64>(0)?,r.get::<_,i64>(1)?,r.get::<_,String>(2)?,r.get::<_,String>(3)?,r.get::<_,String>(4)?))).unwrap().collect::<Result<Vec<_>,_>>().unwrap_or_default();rows
+  };
+  for (alert,task,device,subscription,kind) in app_jobs {
+   let result=async {
+    let pem=std::fs::read(std::env::var("NHIP_VAPID_PEM").map_err(|e|e.to_string())?).map_err(|e|e.to_string())?;
+    let sub:SubscriptionInfo=serde_json::from_str(&subscription).map_err(|e|e.to_string())?;
+    let mut sig=VapidSignatureBuilder::from_pem(pem.as_slice(),&sub).map_err(|e|e.to_string())?;
+    sig.add_claim("sub",std::env::var("NHIP_VAPID_SUBJECT").unwrap_or_else(|_|"mailto:admin@example.com".into()));
+    let title=if kind=="decision"{"Cần chọn: làm ngay, tái cấu trúc hoặc bỏ"}else{"Bạn có công việc cần phản hồi"};
+    let payload=json!({"id":1_000_000_000_i64+alert,"source":"app","task_id":task,"title":title}).to_string();
+    let mut builder=WebPushMessageBuilder::new(&sub);builder.set_payload(ContentEncoding::Aes128Gcm,payload.as_bytes());builder.set_vapid_signature(sig.build().map_err(|e|e.to_string())?);
+    tokio::time::timeout(std::time::Duration::from_secs(10),client.send(builder.build().map_err(|e|e.to_string())?)).await.map_err(|e|e.to_string())?.map_err(|e|e.to_string())
+   }.await;
+   if let Ok(c)=s.db.lock(){let _=c.execute("UPDATE app_push_delivery SET attempts=attempts+1,next_try=?3,status=?4 WHERE alert_id=?1 AND device=?2",params![alert,device,chrono::Utc::now().timestamp()+60,if result.is_ok(){"sent"}else{"pending"}]);}
+   if result.is_err(){eprintln!("App push alert {alert} failed; retry is scheduled.");}
+  }
+  let report_jobs={let c=match s.db.lock(){Ok(c)=>c,Err(_)=>continue};
+   let _=c.execute("INSERT OR IGNORE INTO app_weekly_report_delivery(week_start,device) SELECT a.week_start,d.id FROM app_weekly_report_alerts a CROSS JOIN devices d WHERE a.acknowledged_at IS NULL AND d.channel='webpush'",[]);
+   let mut stmt=match c.prepare("SELECT a.week_start,d.id,d.subscription FROM app_weekly_report_delivery p JOIN app_weekly_report_alerts a ON a.week_start=p.week_start JOIN devices d ON d.id=p.device WHERE a.acknowledged_at IS NULL AND p.status='pending' AND p.attempts<5 AND p.next_try<=?1 LIMIT 10"){Ok(q)=>q,Err(_)=>continue};
+   stmt.query_map([chrono::Utc::now().timestamp()],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,String>(2)?))).unwrap().collect::<Result<Vec<_>,_>>().unwrap_or_default()
+  };
+  for (week_start,device,subscription) in report_jobs{
+   let result=async {
+    let pem=std::fs::read(std::env::var("NHIP_VAPID_PEM").map_err(|e|e.to_string())?).map_err(|e|e.to_string())?;
+    let sub:SubscriptionInfo=serde_json::from_str(&subscription).map_err(|e|e.to_string())?;
+    let mut sig=VapidSignatureBuilder::from_pem(pem.as_slice(),&sub).map_err(|e|e.to_string())?;
+    sig.add_claim("sub",std::env::var("NHIP_VAPID_SUBJECT").unwrap_or_else(|_|"mailto:admin@example.com".into()));
+    let id=crate::weekly_report::notification_id(&week_start).ok_or_else(||"Invalid weekly report date".to_owned())?;
+    let payload=json!({"id":id,"task_id":0,"title":"Báo cáo tuần đã sẵn sàng","source":"report","week_start":week_start}).to_string();
+    let mut builder=WebPushMessageBuilder::new(&sub);builder.set_payload(ContentEncoding::Aes128Gcm,payload.as_bytes());builder.set_vapid_signature(sig.build().map_err(|e|e.to_string())?);
+    tokio::time::timeout(std::time::Duration::from_secs(10),client.send(builder.build().map_err(|e|e.to_string())?)).await.map_err(|e|e.to_string())?.map_err(|e|e.to_string())
+   }.await;
+   if let Ok(c)=s.db.lock(){let _=c.execute("UPDATE app_weekly_report_delivery SET attempts=attempts+1,next_try=?3,status=?4 WHERE week_start=?1 AND device=?2",params![week_start,device,chrono::Utc::now().timestamp()+60,if result.is_ok(){"sent"}else{"pending"}]);}
+   if result.is_err(){eprintln!("Weekly report push failed; retry is scheduled.");}
   }
  }
 }

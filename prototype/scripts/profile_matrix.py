@@ -21,7 +21,7 @@ def main():
  try:
   with socket.socket() as probe:occupied=probe.connect_ex(('127.0.0.1',4876))==0
   if occupied:raise RuntimeError('Close manual backend first; this matrix uses its own fixture')
-  env={**os.environ,'NHIP_DB':str(work/'fixture.sqlite'),'NHIP_DIST':str(ROOT/'dist')};env.pop('NHIP_ACCESS_KEY',None)
+  env={**os.environ,'NHIP_DB':str(work/'fixture.sqlite'),'NHIP_DIST':str(ROOT/'dist'),'NHIP_SEED_FIXTURE':'1'};env.pop('NHIP_ACCESS_KEY',None)
   backend=subprocess.Popen([str(ROOT/'backend/target/release/nhip-backend')],env=env,cwd=ROOT,stdout=log,stderr=subprocess.STDOUT)
   report['fixture']=wait_ready(4876,backend)
   for app,display,state,run in itertools.product(['minimal','prototype'],['wayland','x11'],['visible','minimized'],range(args.runs)):
